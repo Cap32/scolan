@@ -1,5 +1,7 @@
 # cap-cli
 
+> 🎩 cap is short for "Copy-And-Paste"
+
 Cross platform sync clibboard.
 
 ## Installations
