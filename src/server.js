@@ -1,0 +1,36 @@
+
+import nssocket from 'nssocket';
+import { getHostId, formatPIN } from './utils';
+import findPortSync from 'find-port-sync';
+import observer from './observer';
+import chalk from 'chalk';
+
+(async function () {
+	const port = findPortSync();
+
+	const server = nssocket
+		.createServer(function (socket) {
+			observer(socket);
+		})
+		.listen(port, function () {
+			const hostId = getHostId();
+			const pin = formatPIN(hostId, port);
+			// console.info('hostId', hostId);
+			// console.info('port', port);
+			const styledCommand = chalk.yellow('cap start --pin=' + pin);
+			console.info(`Please run \`${styledCommand}\` on another device`);
+			console.info(`Make sure all devices are on the same LAN`);
+		})
+	;
+
+	server
+		.on('connection', function () {
+			server.getConnections(function (err, count) {
+				if (err) { throw err; }
+
+				console.info('Connect success');
+				console.info('Client(s): ' + count);
+			});
+		})
+	;
+}());

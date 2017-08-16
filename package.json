@@ -1,0 +1,70 @@
+{
+  "name": "cap-cli",
+  "description": "Cross platform sync clipboard",
+  "version": "0.0.0",
+  "main": "lib/index",
+  "bin": {
+    "cap": "bin/cap"
+  },
+  "files": [
+    "*.md",
+    "lib",
+    "bin"
+  ],
+  "scripts": {
+    "cli": "cross-env NODE_ENV=development ./bin/cap",
+    "prebuild": "rimraf lib",
+    "build": "babel src -d lib",
+    "preversion": "yarn build"
+  },
+  "author": "Cap32",
+  "repository": "Cap32/cap-cli",
+  "engines": {
+    "node": ">=4.2.1"
+  },
+  "keywords": [],
+  "licenses": "MIT",
+  "dependencies": {
+    "chalk": "^2.1.0",
+    "clipboardy": "^1.1.4",
+    "find-port-sync": "^1.1.0",
+    "get-my-ip": "^0.0.1",
+    "gradient-string": "^0.1.2",
+    "hashids": "^1.1.1",
+    "nssocket": "^0.6.0",
+    "pot-js": "^0.0.0-beta.32",
+    "yargs": "^8.0.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-core": "^6.13.2",
+    "babel-eslint": "^7.2.3",
+    "babel-jest": "^20.0.3",
+    "babel-plugin-transform-es2015-destructuring": "^6.19.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.18.0",
+    "babel-plugin-transform-es2015-parameters": "^6.18.0",
+    "babel-plugin-transform-es2015-spread": "^6.22.0",
+    "babel-polyfill": "^6.13.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "babel-register": "^6.11.6",
+    "cross-env": "^4.0.0",
+    "eslint": "^3.19.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jest": "^19.0.1",
+    "eslint-plugin-node": "^4.2.2",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "jest": "^20.0.4",
+    "rimraf": "^2.5.4"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ],
+    "modulePathIgnorePatterns": [
+      "node_modules",
+      "lib"
+    ]
+  }
+}
