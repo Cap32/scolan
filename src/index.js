@@ -47,7 +47,7 @@ yargs
 					daemon,
 
 					// name: `cap-${isServer ? 'server' : 'client'}`,
-					logLevel: 'DEBUG',
+					// logLevel: 'DEBUG',
 
 					clipboardConnections: 0,
 				});
@@ -62,14 +62,16 @@ yargs
 			}
 
 			const exit = () => {
-				stop({ force: true, workspace: 'cap', name: 'cap' }).catch();
+				stop({
+					force: true,
+					workspace: 'cap',
+					name: 'cap',
+					logLevel: 'OFF',
+				}).catch();
 			};
 
 			process.on('SIGINT', exit);
-			process.on('SIGHUP', exit);
 			process.on('SIGTERM', exit);
-			process.on('SIGBREAK', exit);
-			process.on('uncaughtException', exit);
 		},
 	})
 	.command({

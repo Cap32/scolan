@@ -1,14 +1,12 @@
 
 import nssocket from 'nssocket';
-import { getHostId, formatPIN } from './utils';
-import findPortSync from 'find-port-sync';
+import { getPort, getHostId, formatPIN } from './utils';
 import observer from './observer';
 import chalk from 'chalk';
 import { Bridge } from 'pot-js';
 
 (async function () {
-	const port = findPortSync();
-
+	const port = await getPort();
 	const server = nssocket
 		.createServer(function (socket) {
 			observer(socket);
@@ -16,6 +14,7 @@ import { Bridge } from 'pot-js';
 		.listen(port, function () {
 			const hostId = getHostId();
 			const pin = formatPIN(hostId, port);
+
 			// console.info('hostId', hostId);
 			// console.info('port', port);
 			const styledCommand = chalk.yellow('cap start --pin=' + pin);
