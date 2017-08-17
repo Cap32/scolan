@@ -60,6 +60,16 @@ yargs
 				console.error(chalk.red('ERROR'), err.message);
 				throw err;
 			}
+
+			const exit = () => {
+				stop({ force: true, workspace: 'cap', name: 'cap' }).catch();
+			};
+
+			process.on('SIGINT', exit);
+			process.on('SIGHUP', exit);
+			process.on('SIGTERM', exit);
+			process.on('SIGBREAK', exit);
+			process.on('uncaughtException', exit);
 		},
 	})
 	.command({
