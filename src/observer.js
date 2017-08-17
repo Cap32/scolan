@@ -4,12 +4,14 @@ import clipboardy from 'clipboardy';
 const eventType = 'copy';
 const clipboardObserverInterval = 500;
 
+const formatEOL = (content = '') => content.replace(/\r/g, '');
+
 export default function observer(socket) {
 	let lastClipboardContent;
 	let hasError = false;
 
 	function observeNewContent(handler) {
-		const content = clipboardy.readSync();
+		const content = formatEOL(clipboardy.readSync());
 		if (typeof lastClipboardContent === 'undefined') {
 			lastClipboardContent = content;
 		}
@@ -25,12 +27,12 @@ export default function observer(socket) {
 	});
 
 	socket.on('close', function () {
-		console.error('Connect closed.');
+		console.error('Connection closed.');
 	});
 
 	socket.on('error', function () {
 		if (!hasError) {
-			console.error('Connect error.');
+			console.error('Connect failed.');
 			hasError = true;
 		}
 	});
@@ -43,6 +45,6 @@ export default function observer(socket) {
 	}, clipboardObserverInterval);
 
 	socket.data(eventType, function (content) {
-		clipboardy.writeSync(content);
+		clipboardy.writeSync(formatEOL(content));
 	});
 }
