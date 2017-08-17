@@ -1,7 +1,7 @@
 {
   "name": "cap-cli",
-  "description": "Cross platform sync clipboard",
-  "version": "0.0.0",
+  "description": "Sync clipboard",
+  "version": "0.0.0-0",
   "main": "lib/index",
   "bin": {
     "cap": "bin/cap"
