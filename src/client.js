@@ -5,7 +5,7 @@ import observer from './observer';
 
 (async function () {
 	const config = JSON.parse(process.env.CAP_CONFIG || '{}');
-	const { pin } = config;
+	const pin = (config.pin || '').toUpperCase();
 	const { hostId, serverPort } = parsePIN(pin);
 	const host = setHostId(hostId);
 
