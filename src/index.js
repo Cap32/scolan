@@ -1,11 +1,13 @@
 
 import yargs from 'yargs';
 import gradient from 'gradient-string';
-import { version } from '../package.json';
+import pkg from '../package.json';
 import { start, stop, Bridge } from 'pot-js';
-import workspace from 'pot-js/lib/utils/workspace';
 import { resolve } from 'path';
 import chalk from 'chalk';
+import updateNotifier from 'update-notifier';
+
+updateNotifier({ pkg }).notify();
 
 // eslint-disable-next-line
 yargs
@@ -32,23 +34,31 @@ yargs
 			;
 		},
 		async handler(argv) {
-			const { daemon, pin } = argv;
-			const isServer = !pin;
-			const bin = isServer ? 'server' : 'client';
-			const entry = resolve(__dirname, '../bin/', bin);
-			await start({
-				entry,
-				env: { CAP_CONFIG: JSON.stringify(argv) },
-				workspace: 'cap',
-				name: 'cap',
-				daemon,
+			try {
+				const { daemon, pin } = argv;
+				const isServer = !pin;
+				const bin = isServer ? 'server' : 'client';
+				const entry = resolve(__dirname, '../bin/', bin);
+				await start({
+					entry,
+					env: { CAP_CONFIG: JSON.stringify(argv) },
+					workspace: 'cap',
+					name: 'cap',
+					daemon,
 
-				// name: `cap-${isServer ? 'server' : 'client'}`,
-				// logLevel: 'DEBUG',
-			});
+					// name: `cap-${isServer ? 'server' : 'client'}`,
+					logLevel: 'DEBUG',
 
-			if (daemon) {
-				console.log('To stop running "cap", please run `cap stop`');
+					clipboardConnections: 0,
+				});
+
+				if (daemon) {
+					console.log('To stop running "cap", please run `cap stop`');
+				}
+			}
+			catch (err) {
+				console.error(chalk.red('ERROR'), err.message);
+				throw err;
 			}
 		},
 	})
@@ -69,7 +79,9 @@ yargs
 			;
 		},
 		handler(argv) {
-			stop({ ...argv, workspace: 'cap', name: 'cap' }).catch();
+			stop({ ...argv, workspace: 'cap', name: 'cap' }).catch((err) => {
+				console.error(chalk.red('ERROR'), err.message || 'unknown error.');
+			});
 		},
 	})
 	.command({
@@ -77,8 +89,7 @@ yargs
 		desc: 'Display status',
 		async handler(argv) {
 			try {
-				workspace.set('cap');
-				const bridge = await Bridge.getByName('cap');
+				const bridge = await Bridge.getByName('cap', 'cap');
 
 				if (!bridge) {
 					console.log('status', chalk.red('NOT running'));
@@ -86,9 +97,12 @@ yargs
 				}
 
 				const state = await bridge.getState();
-				const { status } = state;
+				const { status, data: { clipboardConnections } } = state;
 				const styled = chalk[status === 'running' ? 'green' : 'red'](status);
-				console.log('status', styled);
+				console.log('');
+				console.log('\tstatus', styled);
+				console.log('\tconnections', chalk.yellow(clipboardConnections));
+				console.log('');
 			}
 			catch (err) {
 				console.error(err);
@@ -97,7 +111,7 @@ yargs
 	})
 	.alias('h', 'help')
 	.help()
-	.version(version)
+	.version(pkg.version)
 	.epilogue(gradient.mind('Powered by Cap32'))
 	.argv
 ;

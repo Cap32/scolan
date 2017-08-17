@@ -4,6 +4,7 @@ import { getHostId, formatPIN } from './utils';
 import findPortSync from 'find-port-sync';
 import observer from './observer';
 import chalk from 'chalk';
+import { Bridge } from 'pot-js';
 
 (async function () {
 	const port = findPortSync();
@@ -25,11 +26,17 @@ import chalk from 'chalk';
 
 	server
 		.on('connection', function () {
-			server.getConnections(function (err, count) {
+			server.getConnections(async function (err, count) {
 				if (err) { throw err; }
 
 				console.info('Connect success');
 				console.info('Client(s): ' + count);
+
+				const bridge = await Bridge.getByName('cap', 'cap');
+
+				if (bridge) {
+					await bridge.setState({ clipboardConnections: count });
+				}
 			});
 		})
 	;
