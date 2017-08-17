@@ -1,10 +1,10 @@
 {
-  "name": "cap-cli",
+  "name": "scolan",
   "description": "Sync clipboard over LAN",
   "version": "0.0.0-2",
   "main": "lib/index",
   "bin": {
-    "cap": "bin/cap"
+    "scolan": "bin/scolan"
   },
   "files": [
     "*.md",
@@ -12,13 +12,13 @@
     "bin"
   ],
   "scripts": {
-    "cli": "cross-env NODE_ENV=development ./bin/cap",
+    "cli": "cross-env NODE_ENV=development node ./bin/scolan",
     "prebuild": "rimraf lib",
     "build": "babel src -d lib",
     "preversion": "yarn build"
   },
   "author": "Cap32",
-  "repository": "Cap32/cap-cli",
+  "repository": "Cap32/scolan",
   "engines": {
     "node": ">=4.2.1"
   },

@@ -7,18 +7,19 @@ import { resolve } from 'path';
 import chalk from 'chalk';
 import updateNotifier from 'update-notifier';
 
+const { name } = pkg;
 updateNotifier({ pkg }).notify();
 
 // eslint-disable-next-line
 yargs
-	.usage(`\n${gradient.fruit('cap <command> [args]')}`)
+	.usage(`\n${gradient.fruit(`${name} <command> [args]`)}`)
 	.demand(1, 'Please specify one of the commands!')
 	.command({
 		command: 'start',
-		desc: 'Start cap',
+		desc: `Start ${name}`,
 		builder(yargs) {
 			yargs // eslint-disable-line
-				.usage(`\n${gradient.fruit('cap start [args]')}`)
+				.usage(`\n${gradient.fruit(`${name} start [args]`)}`)
 				.options({
 					pin: {
 						desc: 'PIN code',
@@ -42,18 +43,21 @@ yargs
 				await start({
 					entry,
 					env: { CAP_CONFIG: JSON.stringify(argv) },
-					workspace: 'cap',
-					name: 'cap',
+					workspace: name,
+					name,
 					daemon,
 
-					// name: `cap-${isServer ? 'server' : 'client'}`,
+					// name: `${name}-${isServer ? 'server' : 'client'}`,
 					// logLevel: 'DEBUG',
 
 					clipboardConnections: 0,
 				});
 
 				if (daemon) {
-					console.log('To stop running "cap", please run `cap stop`');
+					const styledCommand = chalk.yellow(`${name} stop`);
+					console.log(
+						`To stop running "${name}", please run \`${styledCommand}\``
+					);
 				}
 			}
 			catch (err) {
@@ -64,8 +68,8 @@ yargs
 			const exit = () => {
 				stop({
 					force: true,
-					workspace: 'cap',
-					name: 'cap',
+					workspace: name,
+					name,
 					logLevel: 'OFF',
 				}).catch();
 			};
@@ -76,10 +80,10 @@ yargs
 	})
 	.command({
 		command: 'stop',
-		desc: 'Stop cap',
+		desc: `Stop ${name}`,
 		builder(yargs) {
 			yargs // eslint-disable-line
-				.usage(`\n${gradient.fruit('cap stop [args]')}`)
+				.usage(`\n${gradient.fruit(`${name} stop [args]`)}`)
 				.options({
 					f: {
 						alias: 'force',
@@ -91,7 +95,7 @@ yargs
 			;
 		},
 		handler(argv) {
-			stop({ ...argv, workspace: 'cap', name: 'cap' }).catch((err) => {
+			stop({ ...argv, workspace: name, name }).catch((err) => {
 				console.error(chalk.red('ERROR'), err.message || 'unknown error.');
 			});
 		},
@@ -101,7 +105,7 @@ yargs
 		desc: 'Display status',
 		async handler(argv) {
 			try {
-				const bridge = await Bridge.getByName('cap', 'cap');
+				const bridge = await Bridge.getByName(name, name);
 
 				if (!bridge) {
 					console.log('status', chalk.red('NOT running'));

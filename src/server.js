@@ -17,7 +17,7 @@ import { Bridge } from 'pot-js';
 
 			// console.info('hostId', hostId);
 			// console.info('port', port);
-			const styledCommand = chalk.yellow('cap start --pin=' + pin);
+			const styledCommand = chalk.yellow('scolan start --pin=' + pin);
 			console.info(
 				`Please run \`${styledCommand}\` on another device in the same LAN`
 			);
@@ -32,7 +32,7 @@ import { Bridge } from 'pot-js';
 				console.info('Connect success');
 				console.info('Client(s): ' + count);
 
-				const bridge = await Bridge.getByName('cap', 'cap');
+				const bridge = await Bridge.getByName('scolan', 'scolan');
 
 				if (bridge) {
 					await bridge.setState({ clipboardConnections: count });
