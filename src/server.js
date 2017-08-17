@@ -18,8 +18,9 @@ import { Bridge } from 'pot-js';
 			// console.info('hostId', hostId);
 			// console.info('port', port);
 			const styledCommand = chalk.yellow('cap start --pin=' + pin);
-			console.info(`Please run \`${styledCommand}\` on another device`);
-			console.info(`Make sure all devices are on the same LAN`);
+			console.info(
+				`Please run \`${styledCommand}\` on another device in the same LAN`
+			);
 		})
 	;
 

@@ -2,7 +2,7 @@
 
 > 🎩 cap is short for "Copy-And-Paste"
 
-Sync clipboard
+Sync clipboard over LAN
 
 ## Installations
 
@@ -17,8 +17,9 @@ $ npm install -g cap-cli
 
 1. Open terminal or cmd on your device
 2. Run `cap start`, it will show you a PIN code
-3. Run `cap start --pin=XXXXXXX` on another device (use the PIN code above instead of XXXXXXXX). Make sure all devices are on the same LAN
-4. Enjoy this awesome
+3. Open terminal or cmd on another device in the same LAN
+4. Run `cap start --pin=XXXXX` (use the PIN code above instead of XXXXX)
+5. Enjoy this awesome
 
 For more usage, please run:
 
