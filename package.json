@@ -1,7 +1,7 @@
 {
   "name": "cap-cli",
   "description": "Sync clipboard",
-  "version": "0.0.0-0",
+  "version": "0.0.0-1",
   "main": "lib/index",
   "bin": {
     "cap": "bin/cap"
