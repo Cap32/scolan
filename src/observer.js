@@ -1,12 +1,15 @@
 
 import clipboardy from 'clipboardy';
 
-const eventType = 'copy';
+const clipEvent = 'clip';
+const stateEvent = 'state';
 const clipboardObserverInterval = 500;
 
 const formatEOL = (content = '') => content.replace(/\r/g, '');
 
-export default function observer(socket) {
+export default function observer(socket, options) {
+	const { getState, setState, isHost } = options;
+
 	let lastClipboardContent;
 	let hasError = false;
 
@@ -40,11 +43,27 @@ export default function observer(socket) {
 	setInterval(function () {
 		observeNewContent(function (content) {
 			console.info('clipboard', content);
-			socket.send(eventType, content);
+			socket.send(clipEvent, content);
 		});
 	}, clipboardObserverInterval);
 
-	socket.data(eventType, function (content) {
+	socket.data(clipEvent, function (content) {
 		clipboardy.writeSync(formatEOL(content));
 	});
+
+	if (isHost) {
+		const sendStateToClient = async () => {
+			const state = await getState();
+			socket.send(stateEvent, state);
+		};
+
+		socket.data(stateEvent, () => {
+			sendStateToClient();
+		});
+	}
+	else {
+		socket.data(stateEvent, (state) => {
+			setState(state);
+		});
+	}
 }

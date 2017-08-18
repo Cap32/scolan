@@ -113,11 +113,12 @@ yargs
 				}
 
 				const state = await bridge.getState();
-				const { status, data: { clipboardConnections } } = state;
+				const { status, data: { clipboardConnections, pin } } = state;
 				const styled = chalk[status === 'running' ? 'green' : 'red'](status);
 				console.log('');
 				console.log('\tstatus', styled);
 				console.log('\tconnections', chalk.yellow(clipboardConnections));
+				console.log('\tpin', chalk.yellow(pin));
 				console.log('');
 			}
 			catch (err) {
