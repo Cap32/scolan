@@ -22,6 +22,7 @@ yargs
 				.usage(`\n${gradient.fruit(`${name} start [args]`)}`)
 				.options({
 					pin: {
+						alias: 'p',
 						desc: 'PIN code',
 						type: 'string',
 					},

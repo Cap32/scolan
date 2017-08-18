@@ -5,31 +5,46 @@ import observer from './observer';
 import chalk from 'chalk';
 import { Bridge } from 'pot-js';
 import { name } from '../package.json';
+import { StateEvent } from './constants';
 
 (async function () {
 	const port = await getPort();
+	let socket;
+	let pin;
+	let clipboardConnections;
+	let server;
 
-	const getState = async () => {
+	const updateState = async () => {
 		const bridge = await Bridge.getByName(name, name);
 		if (bridge) {
-			const state = await bridge.getState() || {};
-			const { clipboardConnections, pin } = (state.data || {});
-			return { clipboardConnections, pin };
+			const state = { clipboardConnections, pin };
+			await bridge.setState(state);
+			socket && socket.send(StateEvent, state);
 		}
 	};
 
-	const server = nssocket
-		.createServer((socket) => {
-			observer(socket, { getState, isHost: true });
-		})
-		.listen(port, async () => {
-			const hostId = getHostId();
-			const pin = formatPIN(hostId, port);
+	const updateConnectionCount = () => {
+		server.getConnections(async (err, count) => {
+			if (err) { throw err; }
 
-			const bridge = await Bridge.getByName(name, name);
-			if (bridge) {
-				await bridge.setState({ pin });
-			}
+			console.info('connection updated:', count);
+			clipboardConnections = count;
+			await updateState();
+		});
+	};
+
+	server = nssocket
+		.createServer(async (sock) => {
+			socket = sock;
+
+			observer(socket);
+			socket.on('close', updateConnectionCount);
+
+			await updateState();
+		})
+		.listen(port, () => {
+			const hostId = getHostId();
+			pin = formatPIN(hostId, port);
 
 			// console.info('hostId', hostId);
 			// console.info('port', port);
@@ -38,21 +53,6 @@ import { name } from '../package.json';
 				`Please run \`${styledCommand}\` on another device in the same LAN`
 			);
 		})
-	;
-
-	server
-		.on('connection', () => {
-			server.getConnections(async (err, count) => {
-				if (err) { throw err; }
-
-				console.info('Connect success');
-				console.info('Client(s): ' + count);
-
-				const bridge = await Bridge.getByName(name, name);
-				if (bridge) {
-					await bridge.setState({ clipboardConnections: count });
-				}
-			});
-		})
+		.on('connection', updateConnectionCount)
 	;
 }());

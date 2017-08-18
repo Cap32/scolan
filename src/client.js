@@ -4,8 +4,14 @@ import { parsePIN, setHostId } from './utils';
 import observer from './observer';
 import { Bridge } from 'pot-js';
 import { name } from '../package.json';
+import { StateEvent } from './constants';
 
 (async function () {
+	const config = JSON.parse(process.env.CAP_CONFIG || '{}');
+	const pin = (config.pin || '').toUpperCase();
+	const { hostId, serverPort } = parsePIN(pin);
+	const host = setHostId(hostId);
+
 	const setState = async (state) => {
 		const bridge = await Bridge.getByName(name, name);
 		if (bridge) {
@@ -13,10 +19,9 @@ import { name } from '../package.json';
 		}
 	};
 
-	const config = JSON.parse(process.env.CAP_CONFIG || '{}');
-	const pin = (config.pin || '').toUpperCase();
-	const { hostId, serverPort } = parsePIN(pin);
-	const host = setHostId(hostId);
+	const resetState = async () => {
+		await setState({ pin, clipboardConnections: 0 });
+	};
 
 	// console.info('pin', pin);
 	// console.info('hostId', hostId);
@@ -28,6 +33,11 @@ import { name } from '../package.json';
 		type: 'tcp4',
 	});
 
-	observer(socket, { setState });
+	observer(socket);
 	socket.connect(serverPort, host);
+
+	socket.data(StateEvent, setState);
+
+	socket.on('start', resetState);
+	socket.on('close', resetState);
 }());

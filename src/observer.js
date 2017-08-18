@@ -1,15 +1,12 @@
 
 import clipboardy from 'clipboardy';
+import { ClipEvent } from './constants';
 
-const clipEvent = 'clip';
-const stateEvent = 'state';
 const clipboardObserverInterval = 500;
 
 const formatEOL = (content = '') => content.replace(/\r/g, '');
 
-export default function observer(socket, options) {
-	const { getState, setState, isHost } = options;
-
+export default function observer(socket) {
 	let lastClipboardContent;
 	let hasError = false;
 
@@ -25,17 +22,17 @@ export default function observer(socket, options) {
 	}
 
 	socket.on('start', function () {
-		console.info('Connect success.');
+		console.info('connected');
 		hasError = false;
 	});
 
 	socket.on('close', function () {
-		console.error('Connection closed.');
+		console.error('disconnected');
 	});
 
 	socket.on('error', function () {
 		if (!hasError) {
-			console.error('Connect failed.');
+			console.error('connect failed');
 			hasError = true;
 		}
 	});
@@ -43,27 +40,11 @@ export default function observer(socket, options) {
 	setInterval(function () {
 		observeNewContent(function (content) {
 			console.info('clipboard', content);
-			socket.send(clipEvent, content);
+			socket.send(ClipEvent, content);
 		});
 	}, clipboardObserverInterval);
 
-	socket.data(clipEvent, function (content) {
+	socket.data(ClipEvent, function (content) {
 		clipboardy.writeSync(formatEOL(content));
 	});
-
-	if (isHost) {
-		const sendStateToClient = async () => {
-			const state = await getState();
-			socket.send(stateEvent, state);
-		};
-
-		socket.data(stateEvent, () => {
-			sendStateToClient();
-		});
-	}
-	else {
-		socket.data(stateEvent, (state) => {
-			setState(state);
-		});
-	}
 }
