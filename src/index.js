@@ -130,6 +130,6 @@ yargs
 	.alias('h', 'help')
 	.help()
 	.version(pkg.version)
-	.epilogue(gradient.mind('Powered by Cap32'))
+	.epilogue(gradient.mind(`Checkout ${pkg.homepage} for detail`))
 	.argv
 ;

@@ -19,6 +19,7 @@
   },
   "author": "Cap32",
   "repository": "Cap32/scolan",
+  "homepage": "https://github.com/Cap32/scolan",
   "engines": {
     "node": ">=4.2.1"
   },
