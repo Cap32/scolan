@@ -1,7 +1,7 @@
 {
   "name": "scolan",
   "description": "Sync clipboard over LAN",
-  "version": "0.0.0-2",
+  "version": "0.0.0",
   "main": "lib/index",
   "bin": {
     "scolan": "bin/scolan"
