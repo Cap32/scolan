@@ -11,7 +11,7 @@ import { StateEvent } from './constants';
 	const port = await getPort();
 	let socket;
 	let pin;
-	let clipboardConnections;
+	let clipboardConnections = 0;
 	let server;
 
 	const updateState = async () => {
@@ -36,11 +36,10 @@ import { StateEvent } from './constants';
 	server = nssocket
 		.createServer(async (sock) => {
 			socket = sock;
-
 			observer(socket);
 			socket.on('close', updateConnectionCount);
 
-			await updateState();
+			// await updateState();
 		})
 		.listen(port, () => {
 			const hostId = getHostId();
@@ -55,4 +54,6 @@ import { StateEvent } from './constants';
 		})
 		.on('connection', updateConnectionCount)
 	;
+
+	await updateState();
 }());
