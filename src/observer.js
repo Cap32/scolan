@@ -1,25 +1,9 @@
 
-import clipboardy from 'clipboardy';
+import clipboard from './clipboard';
 import { ClipEvent } from './constants';
 
-const clipboardObserverInterval = 500;
-
-const formatEOL = (content = '') => content.replace(/\r/g, '');
-
 export default function observer(socket) {
-	let lastClipboardContent;
 	let hasError = false;
-
-	function observeNewContent(handler) {
-		const content = formatEOL(clipboardy.readSync());
-		if (typeof lastClipboardContent === 'undefined') {
-			lastClipboardContent = content;
-		}
-		else if (content !== lastClipboardContent) {
-			lastClipboardContent = content;
-			handler(content);
-		}
-	}
 
 	socket.on('start', function () {
 		console.info('connected');
@@ -37,14 +21,12 @@ export default function observer(socket) {
 		}
 	});
 
-	setInterval(function () {
-		observeNewContent(function (content) {
-			console.info('clipboard', content);
-			socket.send(ClipEvent, content);
-		});
-	}, clipboardObserverInterval);
+	clipboard.observe((content) => {
+		console.info('clipboard', content);
+		socket.send(ClipEvent, content);
+	});
 
 	socket.data(ClipEvent, function (content) {
-		clipboardy.writeSync(formatEOL(content));
+		clipboard.write(content);
 	});
 }
