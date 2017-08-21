@@ -23,8 +23,18 @@
   "engines": {
     "node": ">=4.2.1"
   },
-  "keywords": [],
-  "licenses": "MIT",
+  "keywords": [
+    "cli",
+    "sync",
+    "cross-platform",
+    "clipboard",
+    "lan",
+    "macos",
+    "windows",
+    "linux",
+    "tool"
+  ],
+  "license": "MIT",
   "dependencies": {
     "chalk": "^2.1.0",
     "clipboardy": "^1.1.4",
