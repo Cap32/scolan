@@ -66,7 +66,8 @@ yargs
 				});
 
 				if (daemon) {
-					startedLog(pin);
+					isServer && startedLog(pin);
+
 					const styledCommand = chalk.yellow(`${name} stop`);
 					console.log(
 						`To stop running "${name}", please run \`${styledCommand}\``
