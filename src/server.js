@@ -1,23 +1,23 @@
 
 import nssocket from 'nssocket';
-import { getPort, getHostId, formatPIN } from './utils';
+import { parsePIN } from './pin';
 import observer from './observer';
-import chalk from 'chalk';
 import { Bridge } from 'pot-js';
 import { name } from '../package.json';
-import { StateEvent } from './constants';
+import { StateEvent, PINEnv } from './constants';
+import { startedLog } from './utils';
 
 (async function () {
-	const port = await getPort();
+	const pin = process.env[PINEnv];
+	const { port } = parsePIN(pin);
 	let socket;
-	let pin;
 	let clipboardConnections = 0;
 	let server;
 
 	const updateState = async () => {
 		const bridge = await Bridge.getByName(name, name);
 		if (bridge) {
-			const state = { clipboardConnections, pin };
+			const state = { clipboardConnections };
 			await bridge.setState(state);
 			socket && socket.send(StateEvent, state);
 		}
@@ -42,15 +42,9 @@ import { StateEvent } from './constants';
 			// await updateState();
 		})
 		.listen(port, () => {
-			const hostId = getHostId();
-			pin = formatPIN(hostId, port);
-
 			// console.info('hostId', hostId);
 			// console.info('port', port);
-			const styledCommand = chalk.yellow(`${name} start --pin=${pin}`);
-			console.info(
-				`Please run \`${styledCommand}\` on another device in the same LAN`
-			);
+			startedLog(pin);
 		})
 		.on('connection', updateConnectionCount)
 	;

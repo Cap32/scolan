@@ -6,8 +6,12 @@ import { start, stop, Bridge } from 'pot-js';
 import { resolve } from 'path';
 import chalk from 'chalk';
 import updateNotifier from 'update-notifier';
+import { generatePIN } from './pin';
+import { startedLog } from './utils';
+import { ConfigEnv, PINEnv } from './constants';
 
 const { name } = pkg;
+
 updateNotifier({ pkg }).notify();
 
 // eslint-disable-next-line
@@ -37,13 +41,19 @@ yargs
 		},
 		async handler(argv) {
 			try {
-				const { daemon, pin } = argv;
-				const isServer = !pin;
+				const { daemon, pin: pinCode } = argv;
+				const isServer = !pinCode;
 				const bin = isServer ? 'server' : 'client';
 				const entry = resolve(__dirname, '../bin/', bin);
+
+				const pin = pinCode || await generatePIN();
+
 				await start({
 					entry,
-					env: { CAP_CONFIG: JSON.stringify(argv) },
+					env: {
+						[ConfigEnv]: JSON.stringify(argv),
+						[PINEnv]: pin,
+					},
 					workspace: name,
 					name,
 					daemon,
@@ -51,10 +61,12 @@ yargs
 					// name: `${name}-${isServer ? 'server' : 'client'}`,
 					// logLevel: 'DEBUG',
 
+					pin,
 					clipboardConnections: 0,
 				});
 
 				if (daemon) {
+					startedLog(pin);
 					const styledCommand = chalk.yellow(`${name} stop`);
 					console.log(
 						`To stop running "${name}", please run \`${styledCommand}\``

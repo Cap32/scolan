@@ -1,16 +1,15 @@
 
 import nssocket from 'nssocket';
-import { parsePIN, setHostId } from './utils';
+import { parsePIN } from './pin';
 import observer from './observer';
 import { Bridge } from 'pot-js';
 import { name } from '../package.json';
-import { StateEvent } from './constants';
+import { StateEvent, ConfigEnv } from './constants';
 
 (async function () {
-	const config = JSON.parse(process.env.CAP_CONFIG || '{}');
+	const config = JSON.parse(process.env[ConfigEnv] || '{}');
 	const pin = (config.pin || '').toUpperCase();
-	const { hostId, serverPort } = parsePIN(pin);
-	const host = setHostId(hostId);
+	const { host, port } = parsePIN(pin);
 
 	const setState = async (state) => {
 		const bridge = await Bridge.getByName(name, name);
@@ -20,12 +19,11 @@ import { StateEvent } from './constants';
 	};
 
 	const resetState = async () => {
-		await setState({ pin, clipboardConnections: 0 });
+		await setState({ clipboardConnections: 0 });
 	};
 
 	// console.info('pin', pin);
-	// console.info('hostId', hostId);
-	// console.info('serverPort', serverPort);
+	// console.info('port', port);
 	// console.info('host', host);
 
 	const socket = new nssocket.NsSocket({
@@ -34,7 +32,7 @@ import { StateEvent } from './constants';
 	});
 
 	observer(socket);
-	socket.connect(serverPort, host);
+	socket.connect(port, host);
 
 	socket.data(StateEvent, setState);
 
